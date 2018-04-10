@@ -35,11 +35,6 @@ trait Parser extends Lexer {
     parseEquals(null)
   }
 
-  /** update currentToken using nextToken in the Lexer. */
-  def readToken: Unit = {
-    currentToken = nextToken
-  }
-
   private def parseEquals(ex: ExprTree): ExprTree = {
     val e = parsePlusMinus(ex) // You should modify this call, to respect operations priority !
     if (currentToken.info == EQSIGN) {
@@ -129,12 +124,17 @@ trait Parser extends Lexer {
     case _ => expected(???)
   }
 
+  private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s
+
   private def parseExprTreeToken[T <: ExprTree](retTree: T): ExprTree = {
     val ret = retTree
     readToken
     ret
   }
 
-  private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s
+  /** update currentToken using nextToken in the Lexer. */
+  def readToken: Unit = {
+    currentToken = nextToken
+  }
 }
 

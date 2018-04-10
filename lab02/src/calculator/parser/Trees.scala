@@ -49,11 +49,8 @@ object Trees {
                   rhs5: ExprTree = NumLit("0"),
                   rhs6: ExprTree = NumLit("1")) extends ExprTree
 
-  case class ModInv(rhs1: ExprTree, rhs2: ExprTree) extends ExprTree
-
-  //prime et quadratic solve ne sont pas à implémenter selon la consigne => il faudrales retirer de Tokens.scala et Lexer.scala!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  case class ModInv(lhs: ExprTree, rhs: ExprTree) extends ExprTree
   //--------------------------------------------------------------------------------------------------------------------
-
 
   /** Leaves Expression Trees */
   case class NumLit(value: String) extends ExprTree

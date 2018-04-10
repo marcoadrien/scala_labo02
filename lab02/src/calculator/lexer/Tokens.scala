@@ -15,16 +15,6 @@ object Tokens {
     def tokenClass: TokenClass
   }
 
-  // memory variable
-  case class ID(name: String) extends TokenInfo with TokenClass {
-    override def toString: String = s"ID($name)"
-  }
-
-  // numeric value
-  case class NUM(value: Int) extends TokenInfo with TokenClass {
-    override def toString: String = s"NUM($value)"
-  }
-
   /** Token */
   class Token(val info: TokenInfo) extends Positional {
     override def toString: String = info.toString
@@ -33,18 +23,12 @@ object Tokens {
   }
 
   /** Tokens */
-  case object BAD extends TokenInfo with TokenClass // represents incorrect tokens.
+  case object BAD extends TokenInfo with TokenClass // Represents incorrect tokens
 
-  case object EOF extends TokenInfo with TokenClass // represents end of file
+  case object EOF extends TokenInfo with TokenClass // Represents end of file
 
   /** Insert other Tokens here */
-  case object EQSIGN extends TokenInfo with TokenClass // =
-
   //--------------------------------------------------------------------------------------------------------------------
-  case object LPAREN extends TokenInfo with TokenClass // (
-
-  case object RPAREN extends TokenInfo with TokenClass // )
-
   case object PLUS extends TokenInfo with TokenClass // +
 
   case object MINUS extends TokenInfo with TokenClass // -
@@ -59,19 +43,30 @@ object Tokens {
 
   case object FACT extends TokenInfo with TokenClass // !
 
+  case object EQSIGN extends TokenInfo with TokenClass // =
+
+  case object LPAREN extends TokenInfo with TokenClass // (
+
+  case object RPAREN extends TokenInfo with TokenClass // )
+
   case object COMMA extends TokenInfo with TokenClass // ,
 
-  case object GCD extends TokenInfo with TokenClass // gcd
+  case object SQRT extends TokenInfo with TokenClass // Square Root
 
-  //case object QSOLVE extends TokenInfo with TokenClass       // quadratic solve
-  case object SQRT extends TokenInfo with TokenClass // sqrt
+  case object GCD extends TokenInfo with TokenClass // Greatest Common Divisor
 
-  //case object PRIME extends TokenInfo with TokenClass     // prime number
-  case object EGCD extends TokenInfo with TokenClass // egcd
+  case object EGCD extends TokenInfo with TokenClass // Extended Euclidean algorithm
 
+  case object MODINV extends TokenInfo with TokenClass // Modular Inverse
+
+  case class NUM(value: Double) extends TokenInfo with TokenClass { // Numeric value
+    override def toString: String = s"NUM($value)"
+  }
+
+  case class ID(name: String) extends TokenInfo with TokenClass { // Memory variable
+    override def toString: String = s"ID($name)"
+  }
   //--------------------------------------------------------------------------------------------------------------------
-
-  case object MODINV extends TokenInfo with TokenClass // modInvert
 
   object Token {
     def apply(info: TokenInfo): Token = new Token(info)
