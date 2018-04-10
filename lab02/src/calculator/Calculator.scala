@@ -2,8 +2,9 @@
 // modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator
 
-import scala.io.Source
 import calculator.parser.Parser
+
+import scala.io.Source
 
 class Calculator(src: String) extends Parser {
 

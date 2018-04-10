@@ -39,7 +39,8 @@ trait Lexer {
         case _ =>
           if (numeric.contains(ch)) {
             setToken(NUM(readMultiple(numeric).toInt))
-          } else if (alphabetic.contains(ch)) {//est-ce qu'un ID peut commencer par un chiffre?????????????????????????voir consigne
+          } else if (alphabetic.contains(ch)) {
+            //est-ce qu'un ID peut commencer par un chiffre?????????????????????????voir consigne
             setToken(keywordOrId(readMultiple(alphanumeric)))
           } else {
             fatalError("Invalid character !")
