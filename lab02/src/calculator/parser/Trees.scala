@@ -23,7 +23,7 @@ object Trees {
   case class Pow(lhs: ExprTree, rhs: ExprTree) extends ExprTree
 
   //???????????????????????
-  case class Fact(lhs: NumLit) extends ExprTree
+  case class Fact(lhs: ExprTree) extends ExprTree
   case class Lparen(rhs: ExprTree) extends ExprTree
   case class Rparen(lhs: ExprTree) extends ExprTree
   case class Comma(lhs: ExprTree, rhs: ExprTree) extends ExprTree

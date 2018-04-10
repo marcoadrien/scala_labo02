@@ -33,9 +33,9 @@ object Tokens {
   case object COMMA extends TokenInfo with TokenClass        // ,
 
   case object GCD extends TokenInfo with TokenClass         // gcd
-  case object QSOLVE extends TokenInfo with TokenClass       // quadratic solve
+  //case object QSOLVE extends TokenInfo with TokenClass       // quadratic solve
   case object SQRT extends TokenInfo with TokenClass        // sqrt
-  case object PRIME extends TokenInfo with TokenClass     // prime number
+  //case object PRIME extends TokenInfo with TokenClass     // prime number
   case object EGCD extends TokenInfo with TokenClass        // egcd
   case object MODINV extends TokenInfo with TokenClass   // modInvert
 

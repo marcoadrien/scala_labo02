@@ -33,7 +33,7 @@ trait Parser extends Lexer {
   }
 
   private def parseEquals(ex: ExprTree): ExprTree = {
-    var e = parseSimpleExpr(ex) // You should modify this call, to respect operations priority !
+    var e = parsePlusMinus(ex) // You should modify this call, to respect operations priority !
     if (currentToken.info == EQSIGN) {
       eat(EQSIGN)
       e match {
@@ -54,8 +54,24 @@ trait Parser extends Lexer {
     }
   }
 
+  private def parsePlusMinus(ex: ExprTree): ExprTree = {
+    var e = parseSimpleExpr(ex)
+    if (currentToken.info == PLUS) {
+     eat(PLUS)
+      val rhs = parseEquals(ex)
+      rhs match {
+        case Assign(_, _) => fatalError("")
+        case _ => Plus(e, rhs)
+      }
+    } else {
+      e
+    }
+  }
+
   private def parseSimpleExpr(ex: ExprTree): ExprTree = {
     currentToken.info match {
+        //faire un ou des eat
+      case NUM(value) => eat(NUM(value)); NumLit(value.toString)
       case _ => expected(???)
     }
   }

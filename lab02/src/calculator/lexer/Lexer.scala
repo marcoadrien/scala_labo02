@@ -58,8 +58,8 @@ trait Lexer {
       case "gcd" => GCD
       case "egcd" => EGCD
       case "modInv" => MODINV
-      case "prime" => PRIME
-      case "qsolve" => QSOLVE
+      //case "prime" => PRIME
+      //case "qsolve" => QSOLVE
       case _ => ID(str.toLowerCase())
       //--------------------------------------------------------------------------------------------
     }
