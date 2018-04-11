@@ -124,11 +124,13 @@ class Parser(source: Source) extends Lexer(source: Source) {
       case COMMA =>
         eat(COMMA)
         parsePlusMinus
-      case NUM(value) => parseExprTreeToken(NumLit(stripDot(value.toString)))
-      case ID(name) => parseExprTreeToken(Identifier(name))
       case SQRT => parseExprTreeToken(Sqrt(parseParenthesis))
       case GCD => parseKeyword(GCD, Gcd)
       case MODINV => parseKeyword(MODINV, ModInv)
+      case PLUS => parseUnaryOperation(PLUS, "+")
+      case MINUS => parseUnaryOperation(MINUS, "-")
+      case NUM(value) => parseExprTreeToken(NumLit(stripDot(value.toString)))
+      case ID(name) => parseExprTreeToken(Identifier(name))
       case _ => expected(EOF, BAD)
     }
   }
@@ -151,6 +153,17 @@ class Parser(source: Source) extends Lexer(source: Source) {
     val ret = f(parsePlusMinus, parsePlusMinus)
     eat(RPAREN)
     ret
+  }
+
+  private def parseUnaryOperation(tokenClass: TokenClass, unaryOperator: String): ExprTree = {
+    if (tokenClass == PLUS || tokenClass == MINUS) {
+      eat(tokenClass)
+      currentToken.info match {
+        case NUM(value) => parseExprTreeToken(NumLit(stripDot(unaryOperator + value.toString)))
+      }
+    } else {
+      fatalError("Invalid unary operator !")
+    }
   }
 
   private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s

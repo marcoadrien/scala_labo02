@@ -39,10 +39,10 @@ class Lexer (source:Source) {
         case ')' => setToken(RPAREN)
         case ',' => setToken(COMMA)
         case _ =>
-          if (numeric.contains(ch)) {
-            setToken(NUM(readMultiple(numeric).toInt))
-          } else if (alphabetic.contains(ch)) {
+          if (alphabetic.contains(ch)) {
             setToken(keywordOrId(readMultiple(alphanumeric)))
+          } else if (numeric.contains(ch)) {
+            setToken(NUM(readMultiple(numeric).toInt))
           } else {
             fatalError("Invalid character !")
             setToken(BAD)
