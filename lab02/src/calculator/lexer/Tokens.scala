@@ -1,5 +1,5 @@
 // Laboratoire 02 - Calculatrice
-// modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator.lexer
 
 import calculator.Positional
@@ -18,6 +18,11 @@ object Tokens {
   class Token(val info: TokenInfo) extends Positional {
     override def toString: String = info.toString
     def tokenClass: TokenClass = info.tokenClass
+  }
+
+  object Token {
+    def apply(info: TokenInfo): Token = new Token(info)
+    def unapply(token: Token): Option[TokenInfo] = Some(token.info)
   }
 
   /** Tokens */
@@ -53,8 +58,6 @@ object Tokens {
 
   case object GCD extends TokenInfo with TokenClass // Greatest Common Divisor
 
-  case object EGCD extends TokenInfo with TokenClass // Extended Euclidean algorithm
-
   case object MODINV extends TokenInfo with TokenClass // Modular Inverse
 
   case class NUM(value: Double) extends TokenInfo with TokenClass { // Numeric value
@@ -65,10 +68,5 @@ object Tokens {
     override def toString: String = s"ID($name)"
   }
   //--------------------------------------------------------------------------------------------------------------------
-
-  object Token {
-    def apply(info: TokenInfo): Token = new Token(info)
-    def unapply(token: Token): Option[TokenInfo] = Some(token.info)
-  }
 
 }

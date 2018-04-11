@@ -1,8 +1,7 @@
 // Laboratoire 02 - Calculatrice
-// modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator.lexer
 
-import calculator.Calculator
 import scala.io.Source
 
 class Lexer (source:Source) {
@@ -43,14 +42,12 @@ class Lexer (source:Source) {
           if (numeric.contains(ch)) {
             setToken(NUM(readMultiple(numeric).toInt))
           } else if (alphabetic.contains(ch)) {
-            //est-ce qu'un ID peut commencer par un chiffre?????????????????????????voir consigne
             setToken(keywordOrId(readMultiple(alphanumeric)))
           } else {
             fatalError("Invalid character !")
             setToken(BAD)
           }
         //------------------------------------------------------------------------------------------
-
       }
     }
   }
@@ -61,7 +58,6 @@ class Lexer (source:Source) {
       //--------------------------------------------------------------------------------------------
       case "sqrt" => SQRT
       case "gcd" => GCD
-      case "egcd" => EGCD
       case "modInv" => MODINV
       case _ => ID(str.toLowerCase())
       //--------------------------------------------------------------------------------------------

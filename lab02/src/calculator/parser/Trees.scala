@@ -1,5 +1,5 @@
 // Laboratoire 02 - Calculatrice
-// modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator.parser
 
 object Trees {
@@ -28,30 +28,14 @@ object Trees {
 
   case class Pow(lhs: ExprTree, rhs: ExprTree) extends ExprTree
 
-  //???????????????????????
   case class Fact(lhs: ExprTree) extends ExprTree
 
-  case class Lparen(rhs: ExprTree) extends ExprTree
-
-  case class Rparen(lhs: ExprTree) extends ExprTree
-
-  case class Comma(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-
-  //???????????????????????
   case class Sqrt(rhs: ExprTree) extends ExprTree
 
   case class Gcd(rhs1: ExprTree, rhs2: ExprTree) extends ExprTree
 
-  case class Egcd(rhs1: ExprTree,
-                  rhs2: ExprTree,
-                  rhs3: ExprTree = NumLit("1"),
-                  rhs4: ExprTree = NumLit("0"),
-                  rhs5: ExprTree = NumLit("0"),
-                  rhs6: ExprTree = NumLit("1")) extends ExprTree
-
   case class ModInv(lhs: ExprTree, rhs: ExprTree) extends ExprTree
   //--------------------------------------------------------------------------------------------------------------------
-
 
   /** Leaves Expression Trees */
   case class NumLit(value: String) extends ExprTree

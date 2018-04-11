@@ -1,32 +1,43 @@
 // Laboratoire 02 - Calculatrice
-// modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator.parser
 
 import calculator.Main.memory
 import calculator.lexer._
 import scala.io.Source
 
-class Parser(source:Source) extends Lexer(source:Source) {
-
+class Parser(source: Source) extends Lexer(source: Source) {
 
   import Trees._
   import calculator.lexer.Tokens._
 
-  def computeSource: Double = { readToken; parseExpr.compute }
-
-  def printTree: Unit = { readToken; println(parseExpr) }
-
   /** Store the current token, as read from the lexer. */
   private var currentToken: Token = Token(BAD)
 
+  def computeSource: Double = {
+    readToken
+    parseExpr.compute
+  }
+
+  def printTree: Unit = {
+    readToken
+    println(parseExpr)
+  }
+
   /** update currentToken using nextToken in the Lexer. */
-  def readToken: Unit = { currentToken = nextToken }
+  def readToken: Unit = currentToken = nextToken
 
   /** ""Eats"" the expected token, or terminates with an error. */
-  private def eat(tokenClass: TokenClass): Unit = if (tokenClass == currentToken.info.tokenClass) readToken else expected(tokenClass)
+  private def eat(tokenClass: TokenClass): Unit =
+    if (tokenClass == currentToken.info.tokenClass)
+      readToken
+    else
+      expected(tokenClass)
 
-  /** Complains that what was found was not expected. The method accepts arbitrarily many arguments of type TokenClass */
-  private def expected(tokenClass: TokenClass, more: TokenClass*): Nothing = fatalError("expected: " + (tokenClass :: more.toList).mkString(" or ") + ", found: " + currentToken)
+  /** Complains that what was found was not expected.
+    * The method accepts arbitrarily many arguments of type TokenClass */
+  private def expected(tokenClass: TokenClass, more: TokenClass*): Nothing =
+    fatalError("expected: " + (tokenClass :: more.toList).mkString(" or ") + ", found: " + currentToken)
 
   private def parseExpr: ExprTree = {
     parseEquals
@@ -37,16 +48,14 @@ class Parser(source:Source) extends Lexer(source:Source) {
     if (currentToken.info == EQSIGN) {
       eat(EQSIGN)
       e match {
-        case id @ Identifier(_) => {
+        case id@Identifier(_) =>
           val rhs = parseEquals
           rhs match {
             case Assign(_, _) => fatalError("Invalid variable declaration !")
-            case _ => {
+            case _ =>
               memory += (id.value -> rhs.compute)
               Assign(id, rhs)
-            }
           }
-        }
         case _ => fatalError("Invalid variable declaration !")
       }
     } else {
@@ -54,51 +63,12 @@ class Parser(source:Source) extends Lexer(source:Source) {
     }
   }
 
-  private def parseTimesDiv: ExprTree = {
-    val e = parseMod
-    if (currentToken.info == TIMES) {
-      ???
-    } else if (currentToken.info == DIV) {
-      ???
-    } else {
-      e
-    }
-  }
-
-  private def parseMod: ExprTree = {
-    val e = parsePow
-    if (currentToken.info == MOD) {
-      ???
-    } else {
-      e
-    }
-  }
-
-  private def parsePow: ExprTree = {
-    val e = parseFact
-    if (currentToken.info == POW) {
-      ???
-    } else {
-      e
-    }
-  }
-
-  private def parseFact: ExprTree = {
-    val e = parseSimpleExpr
-    if (currentToken.info == FACT) {
-      ???
-    } else {
-      e
-    }
-  }
-
-
   private def parsePlusMinus: ExprTree = {
-    var e = parseTimesDiv // You should modify this call, to respect operations priority !
+    var e = parseTimesDiv
     while (currentToken.info == PLUS || currentToken.info == MINUS) {
       if (currentToken.info == PLUS) {
         eat(PLUS)
-        e = Plus(e, parseTimesDiv) // You should modify this call, to respect operations priority !
+        e = Plus(e, parseTimesDiv)
       } else {
         eat(MINUS)
         e = Minus(e, parseTimesDiv)
@@ -107,47 +77,81 @@ class Parser(source:Source) extends Lexer(source:Source) {
     e
   }
 
+  private def parseTimesDiv: ExprTree = {
+    var e = parseMod
+    while (currentToken.info == TIMES || currentToken.info == DIV) {
+      if (currentToken.info == TIMES) {
+        eat(TIMES)
+        e = Times(e, parseMod)
+      } else {
+        eat(TIMES)
+        e = Div(e, parseMod)
+      }
+    }
+    e
+  }
+
+  private def parseMod: ExprTree = {
+    var e = parsePow
+    while (currentToken.info == MOD) {
+      eat(MOD)
+      e = Mod(e, parsePow)
+    }
+    e
+  }
+
+  private def parsePow: ExprTree = {
+    var e = parseFact
+    while (currentToken.info == POW) {
+      eat(POW)
+      e = Pow(e, parseFact)
+    }
+    e
+  }
+
+  private def parseFact: ExprTree = {
+    var e = parseSimpleExpr
+    while (currentToken.info == FACT) {
+      eat(FACT)
+      e = Fact(e)
+    }
+    e
+  }
 
   private def parseSimpleExpr: ExprTree = {
-    // Here you want to match simple expressions such as NUM(value) and parse them (for example with the parseExprTreeToken method).
     currentToken.info match {
       case LPAREN => parseParenthesis // Parenthesis
       case COMMA =>
         eat(COMMA)
         parsePlusMinus
-      case NUM(value) =>
-        eat(NUM(value))
-        NumLit(stripDot(value.toString))
-      case ID(name) =>
-        eat(ID(name))
-        Identifier(name)
-      case SQRT =>
-        eat(SQRT)
-        Sqrt(parseParenthesis())
-      case GCD =>
-        eat(GCD)
-        eat(LPAREN)
-        val ret = Gcd(parsePlusMinus, parsePlusMinus)
-        eat(RPAREN)
-        ret
-      case _      => expected(COMMA)
+      case NUM(value) => parseExprTreeToken(NumLit(stripDot(value.toString)))
+      case ID(name) => parseExprTreeToken(Identifier(name))
+      case SQRT => parseExprTreeToken(Sqrt(parseParenthesis))
+      case GCD => parseKeyword(GCD, Gcd)
+      case MODINV => parseKeyword(MODINV, ModInv)
+      case _ => expected(EOF, BAD)
     }
   }
-
-  private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s
 
   private def parseExprTreeToken[T <: ExprTree](retTree: T): ExprTree = {
     readToken
     retTree
   }
 
-  private def parseParenthesis(): ExprTree = {
+  private def parseParenthesis: ExprTree = {
     eat(LPAREN)
     val ret = parsePlusMinus
     eat(RPAREN)
     ret
   }
+
+  private def parseKeyword(tokenClass: TokenClass, f:(ExprTree, ExprTree) => ExprTree): ExprTree = {
+    eat(tokenClass)
+    eat(LPAREN)
+    val ret = f(parsePlusMinus, parsePlusMinus)
+    eat(RPAREN)
+    ret
+  }
+
+  private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s
 }
-
-
-
