@@ -112,13 +112,25 @@ class Parser(source:Source) extends Lexer(source:Source) {
     // Here you want to match simple expressions such as NUM(value) and parse them (for example with the parseExprTreeToken method).
     currentToken.info match {
       case LPAREN => parseParenthesis // Parenthesis
+      case COMMA =>
+        eat(COMMA)
+        parsePlusMinus
       case NUM(value) =>
         eat(NUM(value))
         NumLit(stripDot(value.toString))
       case ID(name) =>
         eat(ID(name))
         Identifier(name)
-      case _      => expected(???)
+      case SQRT =>
+        eat(SQRT)
+        Sqrt(parseParenthesis())
+      case GCD =>
+        eat(GCD)
+        eat(LPAREN)
+        val ret = Gcd(parsePlusMinus, parsePlusMinus)
+        eat(RPAREN)
+        ret
+      case _      => expected(COMMA)
     }
   }
 
