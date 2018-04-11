@@ -3,14 +3,13 @@
 package calculator
 
 trait Positional {
-  self =>
 
   private var _pos: Int = -1
 
   def pos: Int = _pos
 
-  def setPos(pos: Int): self.type = {
+  def setPos(pos: Int): this.type = {
     this._pos = pos
-    self
+    this
   }
 }

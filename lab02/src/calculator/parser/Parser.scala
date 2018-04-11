@@ -2,28 +2,25 @@
 // modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator.parser
 
-import calculator.Calculator
 import calculator.Main.memory
 import calculator.lexer._
+import scala.io.Source
 
-trait Parser extends Lexer {
-  self: Calculator =>
+class Parser(source:Source) extends Lexer(source:Source) {
+
 
   import Trees._
   import calculator.lexer.Tokens._
 
+  def computeSource: Double = { readToken; parseExpr.compute }
+
+  def printTree: Unit = { readToken; println(parseExpr) }
+
   /** Store the current token, as read from the lexer. */
   private var currentToken: Token = Token(BAD)
 
-  def computeSource: Double = {
-    readToken
-    parseExpr.compute
-  }
-
-  def printTree: Unit = {
-    readToken
-    println(parseExpr)
-  }
+  /** update currentToken using nextToken in the Lexer. */
+  def readToken: Unit = { currentToken = nextToken }
 
   /** ""Eats"" the expected token, or terminates with an error. */
   private def eat(tokenClass: TokenClass): Unit = if (tokenClass == currentToken.info.tokenClass) readToken else expected(tokenClass)
@@ -32,22 +29,24 @@ trait Parser extends Lexer {
   private def expected(tokenClass: TokenClass, more: TokenClass*): Nothing = fatalError("expected: " + (tokenClass :: more.toList).mkString(" or ") + ", found: " + currentToken)
 
   private def parseExpr: ExprTree = {
-    parseEquals(null)
+    parseEquals
   }
 
-  private def parseEquals(ex: ExprTree): ExprTree = {
-    val e = parsePlusMinus(ex) // You should modify this call, to respect operations priority !
+  private def parseEquals: ExprTree = {
+    val e = parsePlusMinus
     if (currentToken.info == EQSIGN) {
       eat(EQSIGN)
       e match {
-        case id@Identifier(_) =>
-          val rhs = parseEquals(ex)
+        case id @ Identifier(_) => {
+          val rhs = parseEquals
           rhs match {
             case Assign(_, _) => fatalError("Invalid variable declaration !")
-            case _ =>
+            case _ => {
               memory += (id.value -> rhs.compute)
               Assign(id, rhs)
+            }
           }
+        }
         case _ => fatalError("Invalid variable declaration !")
       }
     } else {
@@ -55,29 +54,8 @@ trait Parser extends Lexer {
     }
   }
 
-  private def parsePlusMinus(ex: ExprTree): ExprTree = {
-    val e = parseTimesDiv(ex)
-    if (currentToken.info == PLUS) {
-      eat(PLUS)
-      val rhs = parseEquals(ex)
-      rhs match {
-        case Assign(_, _) => fatalError("Invalid variable declaration !")
-        case _ => Plus(e, rhs)
-      }
-    } else if (currentToken.info == MINUS) {
-      eat(MINUS)
-      val rhs = parseEquals(ex)
-      rhs match {
-        case Assign(_, _) => fatalError("Invalid variable declaration !")
-        case _ => Minus(e, rhs)
-      }
-    } else {
-      e
-    }
-  }
-
-  private def parseTimesDiv(ex: ExprTree): ExprTree = {
-    val e = parseMod(ex)
+  private def parseTimesDiv: ExprTree = {
+    val e = parseMod
     if (currentToken.info == TIMES) {
       ???
     } else if (currentToken.info == DIV) {
@@ -87,8 +65,8 @@ trait Parser extends Lexer {
     }
   }
 
-  private def parseMod(ex: ExprTree): ExprTree = {
-    val e = parsePow(ex)
+  private def parseMod: ExprTree = {
+    val e = parsePow
     if (currentToken.info == MOD) {
       ???
     } else {
@@ -96,8 +74,8 @@ trait Parser extends Lexer {
     }
   }
 
-  private def parsePow(ex: ExprTree): ExprTree = {
-    val e = parseFact(ex)
+  private def parsePow: ExprTree = {
+    val e = parseFact
     if (currentToken.info == POW) {
       ???
     } else {
@@ -105,8 +83,8 @@ trait Parser extends Lexer {
     }
   }
 
-  private def parseFact(ex: ExprTree): ExprTree = {
-    val e = parseSimpleExpr(ex)
+  private def parseFact: ExprTree = {
+    val e = parseSimpleExpr
     if (currentToken.info == FACT) {
       ???
     } else {
@@ -114,27 +92,50 @@ trait Parser extends Lexer {
     }
   }
 
-  private def parseSimpleExpr(ex: ExprTree): ExprTree = currentToken.info match {
-    case NUM(value) =>
-      eat(NUM(value))
-      NumLit(stripDot(value.toString))
-    case ID(name) =>
-      eat(ID(name))
-      Identifier(name)
-    case _ => expected(???)
+
+  private def parsePlusMinus: ExprTree = {
+    var e = parseTimesDiv // You should modify this call, to respect operations priority !
+    while (currentToken.info == PLUS || currentToken.info == MINUS) {
+      if (currentToken.info == PLUS) {
+        eat(PLUS)
+        e = Plus(e, parseTimesDiv) // You should modify this call, to respect operations priority !
+      } else {
+        eat(MINUS)
+        e = Minus(e, parseTimesDiv)
+      }
+    }
+    e
+  }
+
+
+  private def parseSimpleExpr: ExprTree = {
+    // Here you want to match simple expressions such as NUM(value) and parse them (for example with the parseExprTreeToken method).
+    currentToken.info match {
+      case LPAREN => parseParenthesis // Parenthesis
+      case NUM(value) =>
+        eat(NUM(value))
+        NumLit(stripDot(value.toString))
+      case ID(name) =>
+        eat(ID(name))
+        Identifier(name)
+      case _      => expected(???)
+    }
   }
 
   private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s
 
   private def parseExprTreeToken[T <: ExprTree](retTree: T): ExprTree = {
-    val ret = retTree
     readToken
-    ret
+    retTree
   }
 
-  /** update currentToken using nextToken in the Lexer. */
-  def readToken: Unit = {
-    currentToken = nextToken
+  private def parseParenthesis(): ExprTree = {
+    eat(LPAREN)
+    val ret = parsePlusMinus
+    eat(RPAREN)
+    ret
   }
 }
+
+
 

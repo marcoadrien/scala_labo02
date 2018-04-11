@@ -7,8 +7,7 @@ import calculator.Positional
 object Tokens {
 
   sealed trait TokenClass {
-    self =>
-    def tokenClass: self.type = self
+    def tokenClass: this.type = this
   }
 
   sealed trait TokenInfo {
@@ -18,7 +17,6 @@ object Tokens {
   /** Token */
   class Token(val info: TokenInfo) extends Positional {
     override def toString: String = info.toString
-
     def tokenClass: TokenClass = info.tokenClass
   }
 
@@ -70,7 +68,6 @@ object Tokens {
 
   object Token {
     def apply(info: TokenInfo): Token = new Token(info)
-
     def unapply(token: Token): Option[TokenInfo] = Some(token.info)
   }
 

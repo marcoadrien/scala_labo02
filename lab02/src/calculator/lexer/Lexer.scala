@@ -1,18 +1,21 @@
+// Laboratoire 02 - Calculatrice
+// modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator.lexer
 
 import calculator.Calculator
+import scala.io.Source
 
-trait Lexer {
-  self: Calculator =>
+class Lexer (source:Source) {
 
   import Tokens._
+
+  var position: Int = 0
+  var ch: Char = ' '
+  var eof: Boolean = false
 
   val numeric: List[Char] = ('0' to '9').toList
   val alphabetic: List[Char] = ('a' to 'z').toList ++ ('A' to 'Z').toList
   val alphanumeric: List[Char] = numeric ++ alphabetic ++ List('_')
-  var position: Int = 0
-  var ch: Char = ' '
-  var eof: Boolean = false
 
   /** Works like an iterator, and returns the next token from the input stream. */
   def nextToken: Token = {
@@ -47,6 +50,7 @@ trait Lexer {
             setToken(BAD)
           }
         //------------------------------------------------------------------------------------------
+
       }
     }
   }
@@ -64,17 +68,14 @@ trait Lexer {
     }
   }
 
+  /** Moves the iterator to the next Char of the input source */
+  def nextChar: Unit = if (source.hasNext) ch = source.next() else { ch = ' '; eof = true }
+
   /** Moves the iterator to the next Char and set previous Token */
-  def setToken(tkn: TokenInfo): Token = {
-    nextChar
-    Token(tkn).setPos(position)
-  }
+  def setToken(tkn: TokenInfo): Token = { nextChar; Token(tkn).setPos(position) }
 
   /** Moves the iterator to the next Char and skip the current token, useful for empty Char */
-  def skipToken: Token = {
-    nextChar
-    nextToken
-  }
+  def skipToken: Token = { nextChar; nextToken }
 
   /** Reads multiple Char at once, useful for detecting variables and keywords */
   def readMultiple(allowed: List[Char]): String = {
@@ -87,9 +88,8 @@ trait Lexer {
     str
   }
 
-  /** Moves the iterator to the next Char of the input source */
-  def nextChar: Unit = if (source.hasNext) ch = source.next() else {
-    ch = ' '
-    eof = true
+  def fatalError(msg: String): Nothing = {
+    println("Fatal error", msg)
+    sys.exit(1)
   }
 }

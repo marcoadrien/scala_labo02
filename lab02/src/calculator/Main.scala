@@ -2,6 +2,7 @@
 // modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator
 
+import scala.io.Source
 import scala.io.StdIn.readLine
 
 object Main {
@@ -16,7 +17,7 @@ object Main {
     readLine match {
       case "quit" => println("Bye !")
       case "usage" => usage(); console()
-      case s => new Calculator(s).execute(); console()
+      case s => new Calculator(Source.fromString(s)).execute(); console()
     }
   }
 
@@ -24,7 +25,7 @@ object Main {
   /** show help commands */
   def usage(): Unit = {
     println("supported operators: \n+\n-\n*\n/\n%\n^\n!\n()\n=")
-    println("supported functions: \nsqrt\nsolve\ngcd\negcd\nmodInvert\nprime")
+    println("supported functions: \nsqrt\ngcd\negcd\nmodInvert")
   }
 
   //--------------------------------------------------------------------------------------------------------------------
