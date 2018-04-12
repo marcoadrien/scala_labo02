@@ -4,7 +4,7 @@ package calculator.lexer
 
 import scala.io.Source
 
-class Lexer (source:Source) {
+class Lexer(source: Source) {
 
   import Tokens._
 
@@ -58,7 +58,7 @@ class Lexer (source:Source) {
       //--------------------------------------------------------------------------------------------
       case "sqrt" => SQRT
       case "gcd" => GCD
-      case "modInv" => MODINV
+      case "modinv" => MODINV
       case _ => ID(str.toLowerCase())
       //--------------------------------------------------------------------------------------------
     }
@@ -88,4 +88,5 @@ class Lexer (source:Source) {
     println("Fatal error", msg)
     sys.exit(1)
   }
+
 }

@@ -1,5 +1,5 @@
 // Laboratoire 02 - Calculatrice
-// modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator
 
 trait Positional {

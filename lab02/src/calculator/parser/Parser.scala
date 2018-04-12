@@ -124,7 +124,7 @@ class Parser(source: Source) extends Lexer(source: Source) {
       case COMMA =>
         eat(COMMA)
         parsePlusMinus
-      case SQRT => parseExprTreeToken(Sqrt(parseParenthesis))
+      case SQRT => parseKeyword(SQRT, Sqrt)
       case GCD => parseKeyword(GCD, Gcd)
       case MODINV => parseKeyword(MODINV, ModInv)
       case PLUS => parseUnaryOperation(PLUS, "+")
@@ -145,6 +145,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
     val ret = parsePlusMinus
     eat(RPAREN)
     ret
+  }
+
+  private def parseKeyword(tokenClass: TokenClass, f:(ExprTree) => ExprTree): ExprTree = {
+    eat(tokenClass)
+    f(parseParenthesis)
   }
 
   private def parseKeyword(tokenClass: TokenClass, f:(ExprTree, ExprTree) => ExprTree): ExprTree = {
@@ -168,4 +173,6 @@ class Parser(source: Source) extends Lexer(source: Source) {
   }
 
   private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s
+
 }
+
