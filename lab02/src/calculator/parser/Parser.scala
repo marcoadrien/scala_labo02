@@ -124,9 +124,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
       case COMMA =>
         eat(COMMA)
         parsePlusMinus
-      case SQRT => parseKeyword(SQRT, Sqrt)
-      case GCD => parseKeyword(GCD, Gcd)
-      case MODINV => parseKeyword(MODINV, ModInv)
+      case SQRT => parseKeyword(Sqrt)
+      case GCD => parseKeyword(Gcd)
+      case MODINV => parseKeyword(ModInv)
+      case PLUS => expected(PLUS)
+      case MINUS => expected(MINUS)
       case NUM(value) => parseExprTreeToken(NumLit(stripDot(value.toString)))
       case ID(name) => parseExprTreeToken(Identifier(name))
       case _ => expected(EOF, BAD)
@@ -145,13 +147,13 @@ class Parser(source: Source) extends Lexer(source: Source) {
     ret
   }
 
-  private def parseKeyword(tokenClass: TokenClass, f:(ExprTree) => ExprTree): ExprTree = {
-    eat(tokenClass)
+  private def parseKeyword(f:(ExprTree) => ExprTree): ExprTree = {
+    eat(currentToken.tokenClass)
     f(parseParenthesis)
   }
 
-  private def parseKeyword(tokenClass: TokenClass, f:(ExprTree, ExprTree) => ExprTree): ExprTree = {
-    eat(tokenClass)
+  private def parseKeyword(f:(ExprTree, ExprTree) => ExprTree): ExprTree = {
+    eat(currentToken.tokenClass)
     eat(LPAREN)
     val ret = f(parsePlusMinus, parsePlusMinus)
     eat(RPAREN)

@@ -45,7 +45,7 @@ class Lexer(source: Source) {
             Token(NUM(readMultiple(numeric).toInt))
           } else {
             fatalError("Invalid character !")
-            setToken(BAD)
+            Token(BAD)
           }
         //------------------------------------------------------------------------------------------
       }
