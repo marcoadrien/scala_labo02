@@ -160,6 +160,7 @@ class Parser(source: Source) extends Lexer(source: Source) {
       eat(tokenClass)
       currentToken.info match {
         case NUM(value) => parseExprTreeToken(NumLit(stripDot(unaryOperator + value.toString)))
+        case _ => fatalError("Multiple unary operator !")
       }
     } else {
       fatalError("Invalid unary operator !")
