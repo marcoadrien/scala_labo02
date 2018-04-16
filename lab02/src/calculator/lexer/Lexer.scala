@@ -2,6 +2,8 @@
 // Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator.lexer
 
+import calculator.utils.Utils
+
 import scala.io.Source
 
 class Lexer(source: Source) {
@@ -26,7 +28,7 @@ class Lexer(source: Source) {
       position = source.pos
       ch match {
         case ' ' => skipToken
-        //------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------------
         case '+' => setToken(PLUS)
         case '-' => setToken(MINUS)
         case '*' => setToken(TIMES)
@@ -42,12 +44,21 @@ class Lexer(source: Source) {
           if (alphabetic.contains(ch)) {
             Token(keywordOrId(readMultiple(alphanumeric)))
           } else if (numeric.contains(ch)) {
-            Token(NUM(readMultiple(numeric).toInt))
+            //TODO: Floating-point arithmetic
+            val value = Utils.stripDot(readMultiple(numeric ++ "."))
+
+            value.count(_ == '.') match {
+              case 0 => Token(NUM(value.toInt))
+              case 1 => Token(NUM(value.toDouble))
+              case _ =>
+                fatalError("Invalid value !")
+                Token(BAD)
+            }
           } else {
             fatalError("Invalid character !")
             Token(BAD)
           }
-        //------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------------
       }
     }
   }
@@ -55,23 +66,27 @@ class Lexer(source: Source) {
   /** Checks and set if the multiple Char found is a keyword or a variable */
   def keywordOrId(str: String): TokenInfo = {
     str.toLowerCase match {
-      //--------------------------------------------------------------------------------------------
       case "sqrt" => SQRT
       case "gcd" => GCD
       case "modinv" => MODINV
       case _ => ID(str.toLowerCase())
-      //--------------------------------------------------------------------------------------------
     }
   }
 
   /** Moves the iterator to the next Char of the input source */
-  def nextChar: Unit = if (source.hasNext) ch = source.next() else { ch = ' '; eof = true }
+  def nextChar: Unit = if (source.hasNext) ch = source.next() else {
+    ch = ' '; eof = true
+  }
 
   /** Moves the iterator to the next Char and set previous Token */
-  def setToken(tkn: TokenInfo): Token = { nextChar; Token(tkn).setPos(position) }
+  def setToken(tkn: TokenInfo): Token = {
+    nextChar; Token(tkn).setPos(position)
+  }
 
   /** Moves the iterator to the next Char and skip the current token, useful for empty Char */
-  def skipToken: Token = { nextChar; nextToken }
+  def skipToken: Token = {
+    nextChar; nextToken
+  }
 
   /** Reads multiple Char at once, useful for detecting variables and keywords */
   def readMultiple(allowed: List[Char]): String = {

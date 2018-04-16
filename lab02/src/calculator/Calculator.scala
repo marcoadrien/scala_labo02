@@ -3,22 +3,18 @@
 package calculator
 
 import calculator.parser.Parser
+import calculator.utils.Utils
+
 import scala.io.Source
 
 class Calculator(source: Source) extends Parser(source: Source) {
 
   def execute(): Unit = printTree
 
-// Next step after checking of older steps
+// TODO: Utiliser des constantes pour définir une réponse
 //  def execute(): Unit = computeSource match {
 //    case Double.NegativeInfinity => println("Memory updated !")
-//    case result => println("Result : " + stripDot(result.toString))
+//    case result => println("Result : " + Utils.stripDot(result.toString))
 //  }
 
-  /**
-    * Strip the ".0" of string
-    * @param s number as a string
-    * @return number as a string without .0 at the end
-    */
-  private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s
 }

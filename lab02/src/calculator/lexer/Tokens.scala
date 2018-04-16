@@ -7,7 +7,8 @@ import calculator.Positional
 object Tokens {
 
   sealed trait TokenClass {
-    def tokenClass: this.type = this
+    self =>
+    def tokenClass: self.type = self
   }
 
   sealed trait TokenInfo {
@@ -17,20 +18,17 @@ object Tokens {
   /** Token */
   class Token(val info: TokenInfo) extends Positional {
     override def toString: String = info.toString
+
     def tokenClass: TokenClass = info.tokenClass
   }
 
   object Token {
     def apply(info: TokenInfo): Token = new Token(info)
+
     def unapply(token: Token): Option[TokenInfo] = Some(token.info)
   }
 
   /** Tokens */
-  case object BAD extends TokenInfo with TokenClass // Represents incorrect tokens
-
-  case object EOF extends TokenInfo with TokenClass // Represents end of file
-
-  /** Insert other Tokens here */
   //--------------------------------------------------------------------------------------------------------------------
   case object PLUS extends TokenInfo with TokenClass // +
 
@@ -67,6 +65,10 @@ object Tokens {
   case class ID(name: String) extends TokenInfo with TokenClass { // Memory variable
     override def toString: String = s"ID($name)"
   }
+
+  case object BAD extends TokenInfo with TokenClass // Represents incorrect tokens
+
+  case object EOF extends TokenInfo with TokenClass // Represents end of file
   //--------------------------------------------------------------------------------------------------------------------
 
 }

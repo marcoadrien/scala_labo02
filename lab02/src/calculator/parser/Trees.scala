@@ -3,37 +3,53 @@
 package calculator.parser
 
 import calculator.Main.memory
+
 import scala.annotation.tailrec
 
 object Trees {
 
   sealed trait ExprTree {
+
+    /**
+      * Compute an expression
+      *
+      * @throws java.lang.Exception is thrown if an unsupported operation is done
+      * @return result of expression
+      */
     @throws(classOf[Exception])
     def compute: Double = this match {
       case Plus(lhs, rhs) => lhs.compute + rhs.compute
       case Minus(lhs, rhs) => lhs.compute - rhs.compute
       case Times(lhs, rhs) => lhs.compute * rhs.compute
-      case Div(lhs, rhs) => lhs.compute / rhs.compute
+      case Div(lhs, rhs) =>
+        val rightOperand = rhs.compute
+        if (rightOperand == 0)
+          throw new UnsupportedOperationException(s"Division by zero undefined")
+        else
+          lhs.compute / rightOperand
       case Mod(lhs, rhs) => lhs.compute % rhs.compute
       case Pow(lhs, rhs) => pow(lhs.compute, rhs.compute.toInt)
       case Fact(lhs) => fact(lhs.compute.toInt)
       case Assign(ident, _) => getValueInMemory(ident.value)
-      case Sqrt(rhs) => sqrt(rhs.compute)
+      case Sqrt(rhs) =>
+        val operand = rhs.compute
+        if (operand < 0)
+          throw new UnsupportedOperationException(s"Square root of a negative operand undefined")
+        else
+          sqrt(operand)
       case Gcd(rhs1, rhs2) => gcd(rhs1.compute.toInt, rhs2.compute.toInt)
       case ModInv(lhs, rhs) => modInv(lhs.compute.toInt, rhs.compute.toInt)
       case NumLit(value) => value.toDouble
       case Identifier(name) => getValueInMemory(name)
-      case _ => ???
+      case _ => throw new UnsupportedOperationException(s"Operation undefined")
     }
   }
 
   /** Nodes Expression Trees */
   /** lhs: left hand side, rhs: right hand side */
-  case class Assign(ident: Identifier, value: ExprTree) extends ExprTree
-
+  //--------------------------------------------------------------------------------------------------------------------
   case class Plus(lhs: ExprTree, rhs: ExprTree) extends ExprTree
 
-  //--------------------------------------------------------------------------------------------------------------------
   case class Minus(lhs: ExprTree, rhs: ExprTree) extends ExprTree
 
   case class Times(lhs: ExprTree, rhs: ExprTree) extends ExprTree
@@ -46,19 +62,21 @@ object Trees {
 
   case class Fact(lhs: ExprTree) extends ExprTree
 
-  case class Sqrt(rhs: ExprTree) extends ExprTree
+  case class Assign(ident: Identifier, value: ExprTree) extends ExprTree
+
+  case class Sqrt(value: ExprTree) extends ExprTree
 
   case class Gcd(rhs1: ExprTree, rhs2: ExprTree) extends ExprTree
 
   case class ModInv(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  //--------------------------------------------------------------------------------------------------------------------
 
   /** Leaves Expression Trees */
   case class NumLit(value: String) extends ExprTree
 
   case class Identifier(value: String) extends ExprTree {
-    override def toString: String = "Identifier('" + value + "')"
+    override def toString: String = s"Identifier('$value')"
   }
+  //--------------------------------------------------------------------------------------------------------------------
 
   /** get the value of a variable in the memory
     *

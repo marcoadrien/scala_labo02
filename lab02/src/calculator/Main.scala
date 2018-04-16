@@ -2,6 +2,7 @@
 // Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
 package calculator
 
+import scala.annotation.tailrec
 import scala.io.Source
 import scala.io.StdIn.readLine
 
@@ -14,6 +15,7 @@ object Main {
     console()
   }
 
+  @tailrec
   def console(): Unit = {
     readLine match {
       case "quit" => println("Bye !")
@@ -29,6 +31,7 @@ object Main {
   //----------------------------------------------------------------------------------------------------------------------
   /** show help commands */
   def usage(): Unit = {
+    //TODO: Add more details
     println("supported operators: \n+\n-\n*\n/\n%\n^\n!\n()\n=")
     println("supported functions: \nsqrt\ngcd\nmodInv")
   }

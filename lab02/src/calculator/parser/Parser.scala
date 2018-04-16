@@ -4,6 +4,8 @@ package calculator.parser
 
 import calculator.Main.memory
 import calculator.lexer._
+import calculator.utils.Utils
+
 import scala.io.Source
 
 class Parser(source: Source) extends Lexer(source: Source) {
@@ -39,10 +41,18 @@ class Parser(source: Source) extends Lexer(source: Source) {
   private def expected(tokenClass: TokenClass, more: TokenClass*): Nothing =
     fatalError("expected: " + (tokenClass :: more.toList).mkString(" or ") + ", found: " + currentToken)
 
-  private def parseExpr: ExprTree = {
-    parseEquals
-  }
+  /**
+    * Parses any expression
+    *
+    * @return result of expression
+    */
+  private def parseExpr: ExprTree = parseEquals
 
+  /**
+    * Parses an equal expression
+    *
+    * @return result of equal expression
+    */
   private def parseEquals: ExprTree = {
     val e = parsePlusMinus
     if (currentToken.info == EQSIGN) {
@@ -63,6 +73,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
     }
   }
 
+  /**
+    * Parses an addition or subtraction expression
+    *
+    * @return result of addition or subtraction expression
+    */
   private def parsePlusMinus: ExprTree = {
     var e = parseTimesDiv
     while (currentToken.info == PLUS || currentToken.info == MINUS) {
@@ -77,6 +92,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
     e
   }
 
+  /**
+    * Parses an multiplication or division expression
+    *
+    * @return result of multiplication or division expression
+    */
   private def parseTimesDiv: ExprTree = {
     var e = parseMod
     while (currentToken.info == TIMES || currentToken.info == DIV) {
@@ -91,6 +111,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
     e
   }
 
+  /**
+    * Parses an modular expression
+    *
+    * @return result of modular expression
+    */
   private def parseMod: ExprTree = {
     var e = parsePow
     while (currentToken.info == MOD) {
@@ -100,6 +125,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
     e
   }
 
+  /**
+    * Parses an exponential expression
+    *
+    * @return result of exponential expression
+    */
   private def parsePow: ExprTree = {
     var e = parseFact
     while (currentToken.info == POW) {
@@ -109,6 +139,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
     e
   }
 
+  /**
+    * Parses an factorial expression
+    *
+    * @return result of factorial expression
+    */
   private def parseFact: ExprTree = {
     var e = parseSimpleExpr
     while (currentToken.info == FACT) {
@@ -118,6 +153,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
     e
   }
 
+  /**
+    * Parses a simple expression like keyword or number
+    *
+    * @return result of simple expression
+    */
   private def parseSimpleExpr: ExprTree = {
     currentToken.info match {
       case LPAREN => parseParenthesis // Parenthesis
@@ -127,19 +167,31 @@ class Parser(source: Source) extends Lexer(source: Source) {
       case SQRT => parseKeyword(Sqrt)
       case GCD => parseKeyword(Gcd)
       case MODINV => parseKeyword(ModInv)
-      case PLUS => expected(PLUS)
-      case MINUS => expected(MINUS)
-      case NUM(value) => parseExprTreeToken(NumLit(stripDot(value.toString)))
+      case PLUS => expected(PLUS) //TODO: unary operator
+      case MINUS => expected(MINUS) //TODO: unary operator
+      case NUM(value) => parseExprTreeToken(NumLit(Utils.stripDot(value.toString)))
       case ID(name) => parseExprTreeToken(Identifier(name))
       case _ => expected(EOF, BAD)
     }
   }
 
+  /**
+    * Reads the next token and executes a parse function
+    *
+    * @param retTree parse function to execute
+    * @tparam T type of function parse's return
+    * @return reTree
+    */
   private def parseExprTreeToken[T <: ExprTree](retTree: T): ExprTree = {
     readToken
     retTree
   }
 
+  /**
+    * Parses an expression between parenthesis
+    *
+    * @return result of expression between parenthesis
+    */
   private def parseParenthesis: ExprTree = {
     eat(LPAREN)
     val ret = parsePlusMinus
@@ -147,20 +199,30 @@ class Parser(source: Source) extends Lexer(source: Source) {
     ret
   }
 
-  private def parseKeyword(f:(ExprTree) => ExprTree): ExprTree = {
+  /**
+    * Parses a keyword as a function with one operand
+    *
+    * @param f function with one parameter as expression
+    * @return function f's return
+    */
+  private def parseKeyword(f: (ExprTree) => ExprTree): ExprTree = {
     eat(currentToken.tokenClass)
     f(parseParenthesis)
   }
 
-  private def parseKeyword(f:(ExprTree, ExprTree) => ExprTree): ExprTree = {
+  /**
+    * Parses a keyword as a function with two operand
+    *
+    * @param f function with two parameter as expression
+    * @return function f's return
+    */
+  private def parseKeyword(f: (ExprTree, ExprTree) => ExprTree): ExprTree = {
     eat(currentToken.tokenClass)
     eat(LPAREN)
     val ret = f(parsePlusMinus, parsePlusMinus)
     eat(RPAREN)
     ret
   }
-
-  private def stripDot(s: String) = if (s endsWith ".0") s.substring(0, s.length - 2) else s
 
 }
 
