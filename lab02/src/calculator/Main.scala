@@ -32,7 +32,6 @@ object Main {
     println("supported operators: \n+\n-\n*\n/\n%\n^\n!\n()\n=")
     println("supported functions: \nsqrt\ngcd\nmodInv")
   }
-
   //--------------------------------------------------------------------------------------------------------------------
 
 }
