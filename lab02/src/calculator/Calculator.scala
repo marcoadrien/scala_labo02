@@ -9,12 +9,12 @@ import scala.io.Source
 
 class Calculator(source: Source) extends Parser(source: Source) {
 
-  def execute(): Unit = printTree
+  //def execute(): Unit = printTree
 
 // TODO: Utiliser des constantes pour définir une réponse
-//  def execute(): Unit = computeSource match {
-//    case Double.NegativeInfinity => println("Memory updated !")
-//    case result => println("Result : " + Utils.stripDot(result.toString))
-//  }
+  def execute(): Unit = computeSource match {
+    case Double.NegativeInfinity => println("Memory updated !")
+    case result => println("Result : " + Utils.stripDot(result.toString))
+  }
 
 }

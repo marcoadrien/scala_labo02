@@ -30,7 +30,7 @@ object Trees {
       case Mod(lhs, rhs) => lhs.compute % rhs.compute
       case Pow(lhs, rhs) => pow(lhs.compute, rhs.compute.toInt)
       case Fact(lhs) => fact(lhs.compute.toInt)
-      case Assign(ident, _) => getValueInMemory(ident.value)
+      case Assign(ident, _) => getValueInMemory(ident.value);
       case Sqrt(rhs) =>
         val operand = rhs.compute
         if (operand < 0)
@@ -84,9 +84,10 @@ object Trees {
     * @return value of variable
     * @throws UnsupportedOperationException if variableName does not exist
     */
-  def getValueInMemory(ident: String): Double =
-    memory.getOrElse(ident,
-      throw new UnsupportedOperationException(s"the variable $ident does not exist"))
+  def getValueInMemory(ident: String): Double = {
+    memory.getOrElse(ident, throw new UnsupportedOperationException(s"the variable $ident does not exist"));
+    //return Double.NegativeInfinity
+  }
 
   /** power
     *
