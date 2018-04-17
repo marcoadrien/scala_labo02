@@ -167,8 +167,8 @@ class Parser(source: Source) extends Lexer(source: Source) {
       case SQRT => parseKeyword(Sqrt)
       case GCD => parseKeyword(Gcd)
       case MODINV => parseKeyword(ModInv)
-      case PLUS => expected(PLUS) //TODO: unary operator
-      case MINUS => expected(MINUS) //TODO: unary operator
+      case PLUS => parseUnaryOperator
+      case MINUS => parseUnaryOperator
       case NUM(value) => parseExprTreeToken(NumLit(Utils.stripDot(value.toString)))
       case ID(name) => parseExprTreeToken(Identifier(name))
       case _ => expected(EOF, BAD)
@@ -222,6 +222,23 @@ class Parser(source: Source) extends Lexer(source: Source) {
     val ret = f(parsePlusMinus, parsePlusMinus)
     eat(RPAREN)
     ret
+  }
+
+  /**
+    * Parses an unary operator and an operand
+    *
+    * @return result of expression
+    */
+  private def parseUnaryOperator: ExprTree = {
+    val lastToken = currentToken.tokenClass
+
+    eat(lastToken)
+
+    lastToken match {
+      case PLUS => parseSimpleExpr
+      case MINUS => Times(parseSimpleExpr, NumLit("-1"))
+      case _ => expected(PLUS, MINUS)
+    }
   }
 
 }
