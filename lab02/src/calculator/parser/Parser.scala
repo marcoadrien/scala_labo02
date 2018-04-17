@@ -169,7 +169,7 @@ class Parser(source: Source) extends Lexer(source: Source) {
       case MODINV => parseKeyword(ModInv)
       case PLUS => parseUnaryOperator
       case MINUS => parseUnaryOperator
-      case NUM(value) => parseExprTreeToken(NumLit(Utils.stripDot(value.toString)))
+      case NUM(value) => parseExprTreeToken(NumLit(Utils.normalize(value.toString)))
       case ID(name) => parseExprTreeToken(Identifier(name))
       case _ => expected(EOF, BAD)
     }

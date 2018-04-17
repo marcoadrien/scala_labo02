@@ -45,13 +45,13 @@ class Lexer(source: Source) {
             Token(keywordOrId(readMultiple(alphanumeric)))
           } else if (numeric.contains(ch)) {
             //TODO: Floating-point arithmetic
-            val value = Utils.stripDot(readMultiple(numeric ++ "."))
+            val value = Utils.normalize(readMultiple(numeric ++ "."))
 
             value.count(_ == '.') match {
               case 0 => Token(NUM(value.toInt))
               case 1 => Token(NUM(value.toDouble))
               case _ =>
-                fatalError("Invalid value !")
+                fatalError("Invalid numeric !")
                 Token(BAD)
             }
           } else {
