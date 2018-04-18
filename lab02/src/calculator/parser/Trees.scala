@@ -24,24 +24,24 @@ object Trees {
       case Div(lhs, rhs) =>
         val rightOperand = rhs.compute
         if (rightOperand == 0)
-          throw new UnsupportedOperationException(s"Division by zero undefined")
+          throw new UnsupportedOperationException("Division by zero undefined")
         else
           lhs.compute / rightOperand
       case Mod(lhs, rhs) => lhs.compute % rhs.compute
       case Pow(lhs, rhs) => pow(lhs.compute, rhs.compute.toInt)
       case Fact(lhs) => fact(lhs.compute.toInt)
-      case Assign(ident, _) => getValueInMemory(ident.value);
+      case Assign(_, _) => Double.NegativeInfinity
       case Sqrt(rhs) =>
         val operand = rhs.compute
         if (operand < 0)
-          throw new UnsupportedOperationException(s"Square root of a negative operand undefined")
+          throw new UnsupportedOperationException("Square root of a negative operand undefined")
         else
           sqrt(operand)
       case Gcd(rhs1, rhs2) => gcd(rhs1.compute.toInt, rhs2.compute.toInt)
       case ModInv(lhs, rhs) => modInv(lhs.compute.toInt, rhs.compute.toInt)
       case NumLit(value) => value.toDouble
       case Identifier(name) => getValueInMemory(name)
-      case _ => throw new UnsupportedOperationException(s"Operation undefined")
+      case _ => throw new UnsupportedOperationException("Operation undefined")
     }
   }
 
@@ -85,8 +85,7 @@ object Trees {
     * @throws UnsupportedOperationException if variableName does not exist
     */
   def getValueInMemory(ident: String): Double = {
-    memory.getOrElse(ident, throw new UnsupportedOperationException(s"the variable $ident does not exist"));
-    //return Double.NegativeInfinity
+    memory.getOrElse(ident, throw new UnsupportedOperationException(s"the variable $ident does not exist"))
   }
 
   /** power
