@@ -50,12 +50,10 @@ class Lexer(source: Source) {
               case 0 => Token(NUM(value.toInt))
               case 1 => Token(NUM(value.toDouble))
               case _ =>
-                fatalError("Invalid numeric !")
-                Token(BAD)
+                throw new UnsupportedOperationException("Invalid numeric")
             }
           } else {
-            fatalError("Invalid character !")
-            Token(BAD)
+            throw new UnsupportedOperationException("Invalid character")
           }
         //--------------------------------------------------------------------------------------------------------------------
       }

@@ -27,7 +27,12 @@ object Trees {
           throw new UnsupportedOperationException("Division by zero undefined")
         else
           lhs.compute / rightOperand
-      case Mod(lhs, rhs) => lhs.compute % rhs.compute
+      case Mod(lhs, rhs) =>
+        val rightOperand = rhs.compute
+        if (rightOperand == 0)
+          throw new UnsupportedOperationException("Modulo by zero undefined")
+        else
+          lhs.compute % rhs.compute
       case Pow(lhs, rhs) => pow(lhs.compute, rhs.compute.toInt)
       case Fact(lhs) => fact(lhs.compute.toInt)
       case Assign(_, _) => Double.NegativeInfinity
