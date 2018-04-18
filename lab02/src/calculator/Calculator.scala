@@ -9,7 +9,7 @@ import scala.io.Source
 
 class Calculator(source: Source) extends Parser(source: Source) {
 
-  val scale = 10
+  val scale = 9
 
  // TODO: Utiliser des constantes pour définir une réponse
   def execute(): Unit = computeSource match {

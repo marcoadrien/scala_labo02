@@ -11,9 +11,9 @@ object Utils {
     */
   @tailrec
   def normalize(s: String): String =
-    if (s endsWith "0")
+    if (s.contains('.') && s.endsWith("0"))
       normalize(s.substring(0, s.length - 1))
-    else if (s endsWith ".")
+    else if (s.contains('.') && s.endsWith("."))
       s.substring(0, s.length - 1)
     else
       s
