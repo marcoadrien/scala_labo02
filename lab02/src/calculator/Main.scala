@@ -46,5 +46,4 @@ object Main {
     println("\nPLEASE ENTER YOUR CALCULATION AND PRESS ENTER TO SHOW THE RESULT...")
   }
   //--------------------------------------------------------------------------------------------------------------------
-
 }
