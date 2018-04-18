@@ -236,7 +236,7 @@ class Parser(source: Source) extends Lexer(source: Source) {
 
     lastToken match {
       case PLUS => parseSimpleExpr
-      case MINUS => Times(parseSimpleExpr, NumLit("-1"))
+      case MINUS => Times(NumLit("-1"), parseSimpleExpr)
       case _ => expected(PLUS, MINUS)
     }
   }
