@@ -44,7 +44,6 @@ class Lexer(source: Source) {
           if (alphabetic.contains(ch)) {
             Token(keywordOrId(readMultiple(alphanumeric)))
           } else if (numeric.contains(ch)) {
-            //TODO: Floating-point arithmetic
             val value = Utils.normalize(readMultiple(numeric ++ "."))
 
             value.count(_ == '.') match {

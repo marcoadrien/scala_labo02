@@ -9,7 +9,6 @@ import scala.io.Source
 
 class Calculator(source: Source) extends Parser(source: Source) {
 
-  // TODO: Utiliser des constantes pour définir une réponse
   def execute(): Unit =
     try {
       computeSource match {
