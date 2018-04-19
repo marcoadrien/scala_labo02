@@ -1,5 +1,8 @@
-// Laboratoire 02 - Calculatrice
-// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+/*
+Laboratoire 02 - Calculatrice
+Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+This class reads the input and assign the different tokens.
+*/
 package calculator.lexer
 
 import calculator.utils.Utils
@@ -20,15 +23,17 @@ class Lexer(source: Source) {
 
   /** Works like an iterator, and returns the next token from the input stream. */
   def nextToken: Token = {
+    //end of file
     if (eof) {
       position = source.pos
       setToken(EOF)
-    } else {
+    } else { //otherwise we read the character
       if (position == 0) nextChar
       position = source.pos
       ch match {
-        case ' ' => skipToken
+        case ' ' => skipToken//we don't use it
         //--------------------------------------------------------------------------------------------------------------------
+        //here are the classic tokens we can find in the calculator
         case '+' => setToken(PLUS)
         case '-' => setToken(MINUS)
         case '*' => setToken(TIMES)
@@ -40,19 +45,26 @@ class Lexer(source: Source) {
         case '(' => setToken(LPAREN)
         case ')' => setToken(RPAREN)
         case ',' => setToken(COMMA)
+        //if it is not a classic token, it can be a memory variable, a numeric value or an upgraded function
+        //like square root for example. And we have to read a set of characters (readMultiple()) to extract the value
+        //that make more sense
         case _ =>
+          //only alphabetic => upgraded function (keyword) or memory variable (ID)
           if (alphabetic.contains(ch)) {
             Token(keywordOrId(readMultiple(alphanumeric)))
-          } else if (numeric.contains(ch)) {
+          }
+          //otherwise => numeric value  (Int or Double)
+          else if (numeric.contains(ch)) {
             val value = Utils.normalize(readMultiple(numeric ++ "."))
-
             value.count(_ == '.') match {
               case 0 => Token(NUM(value.toInt))
-              case 1 => Token(NUM(value.toDouble))
+              case 1 => Token(NUM(value.toDouble))//if we find a '.' => it is a double, if we find more => error
               case _ =>
                 throw new UnsupportedOperationException("Invalid numeric")
             }
-          } else {
+          }
+          //if unknown character => error
+          else {
             throw new UnsupportedOperationException("Invalid character")
           }
         //--------------------------------------------------------------------------------------------------------------------
@@ -60,13 +72,13 @@ class Lexer(source: Source) {
     }
   }
 
-  /** Checks and set if the multiple Char found is a keyword or a variable */
+  /** Checks and set if the multiple Char found (str:String) is a keyword or a variable */
   def keywordOrId(str: String): TokenInfo = {
     str.toLowerCase match {
-      case "sqrt" => SQRT
-      case "gcd" => GCD
-      case "modinv" => MODINV
-      case _ => ID(str.toLowerCase())
+      case "sqrt" => SQRT //square root
+      case "gcd" => GCD //biggest common divisor
+      case "modinv" => MODINV //modulo inverse
+      case _ => ID(str.toLowerCase()) //memory variable name (ID)
     }
   }
 

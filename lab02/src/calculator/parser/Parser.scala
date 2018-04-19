@@ -1,5 +1,13 @@
-// Laboratoire 02 - Calculatrice
-// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+/*
+Laboratoire 02 - Calculatrice
+Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+This class is going to parse the caluclation expression and compute it recursively to respect the operations priority
+and the left associativity.
+We respect the priority of the operations by calling each time the prioritary function before processing anything else.
+For example: equals operation has less priority than Plus or Minus so we call them before. Plus or Minus have less
+priority than Times or Division so we call them before...Finally we arrive to a simple expression as a numeric value or
+an ID, parenthesis or even a keyword that are the most prioritary and we can evaluate them.
+*/
 package calculator.parser
 
 import calculator.Main.memory
@@ -226,6 +234,7 @@ class Parser(source: Source) extends Lexer(source: Source) {
 
   /**
     * Parses an unary operator and an operand
+    * We use it for negative numbers for example
     *
     * @return result of expression
     */

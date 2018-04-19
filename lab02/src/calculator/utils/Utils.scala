@@ -1,3 +1,8 @@
+/*
+Laboratoire 02 - Calculatrice
+Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+This class gives a normalization tool for a string
+*/
 package calculator.utils
 
 import scala.annotation.tailrec

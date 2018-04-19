@@ -1,5 +1,8 @@
-// Laboratoire 02 - Calculatrice
-// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+/*
+Laboratoire 02 - Calculatrice
+Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+This class defines all the tokens we can use in this calculator.
+*/
 package calculator.lexer
 
 import calculator.Positional

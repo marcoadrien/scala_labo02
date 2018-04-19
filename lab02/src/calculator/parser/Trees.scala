@@ -1,5 +1,13 @@
-// Laboratoire 02 - Calculatrice
-// Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+/*
+Laboratoire 02 - Calculatrice
+Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
+This class defines a calculation tree with nodes (operations) and leaves (values).
+The operations are implemented here so we can compute each sub tree of the tree to get a final result.
+Leaves are computed in the node operations like Plus/Minus/Times...
+If we represent the calculation with a tree, we start by the evaluation of the leaves to use them as parameter in the
+node operation to evaluate the new value and we do it again for the next level of the tree (recursion)
+*/
+
 package calculator.parser
 
 import calculator.Main.memory
@@ -11,7 +19,7 @@ object Trees {
   sealed trait ExprTree {
 
     /**
-      * Compute an expression
+      * Computes recursively an expression Tree by matching the good operations depending on the nodes
       *
       * @throws java.lang.Exception is thrown if an unsupported operation is done
       * @return result of expression
@@ -35,7 +43,7 @@ object Trees {
           lhs.compute % rhs.compute
       case Pow(lhs, rhs) => pow(lhs.compute, rhs.compute.toInt)
       case Fact(lhs) => fact(lhs.compute.toInt)
-      case Assign(_, _) => Double.NegativeInfinity
+      case Assign(_, _) => Double.NegativeInfinity //memory updated case
       case Sqrt(rhs) =>
         val operand = rhs.compute
         if (operand < 0)
