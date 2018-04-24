@@ -177,7 +177,8 @@ object Trees {
         x
       else
         sqrt(n, (x + n / x) / 2, epsilon)
-    sqrt(n, 1, epsilon)
+    if(n == 0) 0
+    else sqrt(n, 1, epsilon)
   }
 
   /** modular inverse of u mod v
