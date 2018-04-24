@@ -1,21 +1,26 @@
 /*
 Laboratoire 02 - Calculatrice
-Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
-This is the main class of the app. It initialize the memory and open the console to read the user input.
-The calculator calls the parser to define the token and compute them. The parser will use the definitions of tokens in
-Tokens.scala, the calculation tree expression in Trees.sacal and reading functions in Lexer.scala to do the job.
-Trees.scala will define the calculation functions
-known in the calculator and represents it as nodes in a tree where the values will be recursively evaluated.
+Modifications: Adrien Marco, Julien Brêchet, Loan Lassalle
 */
+
 package calculator
 
 import scala.annotation.tailrec
 import scala.io.Source
 import scala.io.StdIn.readLine
 
+/**
+  * This is the main class of the app. It initializes the memory and open the console to read the user input.
+  * The calculator calls the parser to define the token and compute them.
+  * The parser will use the definitions of tokens in Tokens.scala,
+  * the calculation tree expression in Trees.scala and reading functions in Lexer.scala to do the job.
+  * Trees.scala will define the calculation functions known in the calculator
+  * and represents it as nodes in a tree where the values will be recursively evaluated.
+  */
 object Main {
 
-  //represents the memory fo the calculator (mapping between variable names and values)
+  // Represents the memory of the calculator
+  // Mapping between variable names and values
   var memory: Map[String, Double] = Map()
 
   def main(args: Array[String]): Unit = {
@@ -23,11 +28,14 @@ object Main {
     console()
   }
 
-  //reads the console input (3 types of possibilities quit/usage/calculation)
+  /**
+    * Reads the console input.
+    * There are 3 types of possibilities: quit, usage or expression to compute.
+    */
   @tailrec
   def console(): Unit = {
     readLine match {
-      case "quit" => println("Bye !")
+      case "quit" => println("Bye!")
       case "usage" =>
         usage()
         console()
@@ -37,7 +45,6 @@ object Main {
     }
   }
 
-  //----------------------------------------------------------------------------------------------------------------------
   /** show help commands */
   def usage(): Unit = {
     println("SUPPORTED OPERATORS: \n+    =>    addition (example: 2 + 1)\n" +
@@ -54,5 +61,5 @@ object Main {
                                     "modInv    =>    modular inverse of u mod v, modInv(u,v) (example: modInv(2,3))")
     println("\nPLEASE ENTER YOUR CALCULATION AND PRESS ENTER TO SHOW THE RESULT...")
   }
-  //--------------------------------------------------------------------------------------------------------------------
+
 }

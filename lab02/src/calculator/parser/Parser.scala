@@ -1,13 +1,8 @@
 /*
 Laboratoire 02 - Calculatrice
-Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
-This class is going to parse the caluclation expression and compute it recursively to respect the operations priority
-and the left associativity.
-We respect the priority of the operations by calling each time the prioritary function before processing anything else.
-For example: equals operation has less priority than Plus or Minus so we call them before. Plus or Minus have less
-priority than Times or Division so we call them before...Finally we arrive to a simple expression as a numeric value or
-an ID, parenthesis or even a keyword that are the most prioritary and we can evaluate them.
+Modifications: Adrien Marco, Julien Brêchet, Loan Lassalle
 */
+
 package calculator.parser
 
 import calculator.Main.memory
@@ -16,12 +11,22 @@ import calculator.utils.Utils
 
 import scala.io.Source
 
+/**
+  * This class is going to parse the computation expression and compute it recursively to respect
+  * the operations priority and the left associativity.
+  * We respect the priority of the operations by calling each time the priority function before processing anything else.
+  * For example: equals operation has less priority than Plus or Minus so we call them before. Plus or Minus have less
+  * priority than Times or Division so we call them before... Finally we arrive to a simple expression as a numeric value or
+  * an ID, parenthesis or even a keyword that are the most priority and we can evaluate them.
+  *
+  * @param source user input
+  */
 class Parser(source: Source) extends Lexer(source: Source) {
 
   import Trees._
   import calculator.lexer.Tokens._
 
-  /** Store the current token, as read from the lexer. */
+  /** Stores the current token, as read from the lexer. */
   private var currentToken: Token = Token(BAD)
 
   def computeSource: Double = {
@@ -34,7 +39,7 @@ class Parser(source: Source) extends Lexer(source: Source) {
     println(parseExpr)
   }
 
-  /** update currentToken using nextToken in the Lexer. */
+  /** Updates currentToken using nextToken in the Lexer. */
   def readToken: Unit = currentToken = nextToken
 
   /** ""Eats"" the expected token, or terminates with an error. */
@@ -50,18 +55,20 @@ class Parser(source: Source) extends Lexer(source: Source) {
     fatalError("expected: " + (tokenClass :: more.toList).mkString(" or ") + ", found: " + currentToken)
 
   /**
-    * Parses any expression
+    * Parses an expression
     *
-    * @return result of expression
+    * @return result of the expression
     */
   private def parseExpr: ExprTree = parseEquals
 
   /**
     * Parses an equal expression
     *
-    * @return result of equal expression
+    * @return result of the equal expression
     */
   private def parseEquals: ExprTree = {
+
+    // Expression analysis compared to other higher priority tokens
     val e = parsePlusMinus
     if (currentToken.info == EQSIGN) {
       eat(EQSIGN)
@@ -84,9 +91,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
   /**
     * Parses an addition or subtraction expression
     *
-    * @return result of addition or subtraction expression
+    * @return result of the addition or subtraction expression
     */
   private def parsePlusMinus: ExprTree = {
+
+    // Expression analysis compared to other higher priority tokens
     var e = parseTimesDiv
     while (currentToken.info == PLUS || currentToken.info == MINUS) {
       if (currentToken.info == PLUS) {
@@ -103,9 +112,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
   /**
     * Parses an multiplication or division expression
     *
-    * @return result of multiplication or division expression
+    * @return result of the multiplication or division expression
     */
   private def parseTimesDiv: ExprTree = {
+
+    // Expression analysis compared to other higher priority tokens
     var e = parseMod
     while (currentToken.info == TIMES || currentToken.info == DIV) {
       if (currentToken.info == TIMES) {
@@ -122,9 +133,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
   /**
     * Parses an modular expression
     *
-    * @return result of modular expression
+    * @return result of the modular expression
     */
   private def parseMod: ExprTree = {
+
+    // Expression analysis compared to other higher priority tokens
     var e = parsePow
     while (currentToken.info == MOD) {
       eat(MOD)
@@ -136,9 +149,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
   /**
     * Parses an exponential expression
     *
-    * @return result of exponential expression
+    * @return result of the exponential expression
     */
   private def parsePow: ExprTree = {
+
+    // Expression analysis compared to other higher priority tokens
     var e = parseFact
     while (currentToken.info == POW) {
       eat(POW)
@@ -150,9 +165,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
   /**
     * Parses an factorial expression
     *
-    * @return result of factorial expression
+    * @return result of the factorial expression
     */
   private def parseFact: ExprTree = {
+
+    // Expression analysis compared to other higher priority tokens
     var e = parseSimpleExpr
     while (currentToken.info == FACT) {
       eat(FACT)
@@ -164,11 +181,11 @@ class Parser(source: Source) extends Lexer(source: Source) {
   /**
     * Parses a simple expression like keyword or number
     *
-    * @return result of simple expression
+    * @return result of the simple expression
     */
   private def parseSimpleExpr: ExprTree = {
     currentToken.info match {
-      case LPAREN => parseParenthesis // Parenthesis
+      case LPAREN => parseParentheses // Parentheses
       case COMMA =>
         eat(COMMA)
         parsePlusMinus
@@ -198,9 +215,9 @@ class Parser(source: Source) extends Lexer(source: Source) {
   /**
     * Parses an expression between parenthesis
     *
-    * @return result of expression between parenthesis
+    * @return result of the expression between parenthesis
     */
-  private def parseParenthesis: ExprTree = {
+  private def parseParentheses: ExprTree = {
     eat(LPAREN)
     val ret = parsePlusMinus
     eat(RPAREN)
@@ -209,17 +226,20 @@ class Parser(source: Source) extends Lexer(source: Source) {
 
   /**
     * Parses a keyword as a function with one operand
+    * Used to handle calculation function like square root
     *
     * @param f function with one parameter as expression
     * @return function f's return
     */
   private def parseKeyword(f: (ExprTree) => ExprTree): ExprTree = {
     eat(currentToken.tokenClass)
-    f(parseParenthesis)
+    f(parseParentheses)
   }
 
   /**
     * Parses a keyword as a function with two operand
+    * Used to handle calculation function like greatest common divisor
+    * or modular multiplicative inverse
     *
     * @param f function with two parameter as expression
     * @return function f's return
@@ -234,15 +254,16 @@ class Parser(source: Source) extends Lexer(source: Source) {
 
   /**
     * Parses an unary operator and an operand
-    * We use it for negative numbers for example
+    * Used to handle negative numbers
     *
-    * @return result of expression
+    * @return result of the expression
     */
   private def parseUnaryOperator: ExprTree = {
     val lastToken = currentToken.tokenClass
 
     eat(lastToken)
 
+    // The sign of the number is deduced from the previous token
     lastToken match {
       case PLUS => parseSimpleExpr
       case MINUS => Times(NumLit("-1"), parseSimpleExpr)

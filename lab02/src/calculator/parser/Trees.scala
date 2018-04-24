@@ -1,11 +1,6 @@
 /*
 Laboratoire 02 - Calculatrice
-Modification: Adrien Marco, Julien Brêchet, Loan Lassalle
-This class defines a calculation tree with nodes (operations) and leaves (values).
-The operations are implemented here so we can compute each sub tree of the tree to get a final result.
-Leaves are computed in the node operations like Plus/Minus/Times...
-If we represent the calculation with a tree, we start by the evaluation of the leaves to use them as parameter in the
-node operation to evaluate the new value and we do it again for the next level of the tree (recursion)
+Modifications: Adrien Marco, Julien Brêchet, Loan Lassalle
 */
 
 package calculator.parser
@@ -14,17 +9,25 @@ import calculator.Main.memory
 
 import scala.annotation.tailrec
 
+/**
+  * This class defines a calculation tree with nodes (operations) and leaves (values).
+  * The operations are implemented here so we can compute each sub tree of the tree to get a final result.
+  * Leaves are computed at the beginning of node operations like Plus, Minus, Times.
+  * If we represent the calculation with a tree, we start by the evaluation of the leaves to use them as parameter in the
+  * node operation to evaluate the new value and we do it again for the next level of the tree (recursion)
+  */
 object Trees {
 
   sealed trait ExprTree {
 
     /**
-      * Computes recursively an expression Tree by matching the good operations depending on the nodes
+      * Computes recursively an expression Tree by matching operations depending on the nodes
+      * Double.NegativeInfinity is used to inform the upper layer that the memory has been updated
       *
-      * @throws java.lang.Exception is thrown if an unsupported operation is done
-      * @return result of expression
+      * @throws java.lang.UnsupportedOperationException is thrown if an unsupported operation is done
+      * @return result of the expression
       */
-    @throws(classOf[Exception])
+    @throws(classOf[UnsupportedOperationException])
     def compute: Double = this match {
       case Plus(lhs, rhs) => lhs.compute + rhs.compute
       case Minus(lhs, rhs) => lhs.compute - rhs.compute
@@ -40,10 +43,10 @@ object Trees {
         if (rightOperand == 0)
           throw new UnsupportedOperationException("Modulo by zero undefined")
         else
-          lhs.compute % rhs.compute
+          lhs.compute % rightOperand
       case Pow(lhs, rhs) => pow(lhs.compute, rhs.compute.toInt)
       case Fact(lhs) => fact(lhs.compute.toInt)
-      case Assign(_, _) => Double.NegativeInfinity //memory updated case
+      case Assign(_, _) => Double.NegativeInfinity // Memory updated case
       case Sqrt(rhs) =>
         val operand = rhs.compute
         if (operand < 0)
@@ -54,13 +57,12 @@ object Trees {
       case ModInv(lhs, rhs) => modInv(lhs.compute.toInt, rhs.compute.toInt)
       case NumLit(value) => value.toDouble
       case Identifier(name) => getValueInMemory(name)
-      case _ => throw new UnsupportedOperationException("Operation undefined")
+      case _ => throw new UnsupportedOperationException("Operation unsupported")
     }
   }
 
   /** Nodes Expression Trees */
   /** lhs: left hand side, rhs: right hand side */
-  //--------------------------------------------------------------------------------------------------------------------
   case class Plus(lhs: ExprTree, rhs: ExprTree) extends ExprTree
 
   case class Minus(lhs: ExprTree, rhs: ExprTree) extends ExprTree
@@ -89,32 +91,31 @@ object Trees {
   case class Identifier(value: String) extends ExprTree {
     override def toString: String = s"Identifier('$value')"
   }
-  //--------------------------------------------------------------------------------------------------------------------
 
-  /** get the value of a variable in the memory
+  /** Gets the value of a variable in the memory
     *
     * @param ident identifier of variable
     * @return value of variable
-    * @throws UnsupportedOperationException if variableName does not exist
+    * @throws UnsupportedOperationException if identifier of variable does not exist
     */
   def getValueInMemory(ident: String): Double = {
     memory.getOrElse(ident, throw new UnsupportedOperationException(s"the variable $ident does not exist"))
   }
 
-  /** power
+  /** Exponentiation
     *
     * @param x base
     * @param y exponent
-    * @return the result of the operation
+    * @return x exponent y
     */
   def pow(x: Double, y: Int): Double = {
 
-    /** power
+    /** Exponentiation tail recursive
       *
       * @param x base
       * @param y exponent
       * @param acc accumulator
-      * @return the result of the operation
+      * @return x exponent y
       */
     @tailrec
     def pow(x: Double, y: Int, acc: Double): Double = y match {
@@ -125,18 +126,18 @@ object Trees {
     pow(x, y, 1)
   }
 
-  /** fact
+  /** Factorial
     *
     * @param x factorial value
-    * @return the result of the operation
+    * @return factorial of x
     */
   def fact(x: Int): Int = {
 
-    /** fact
+    /** Factorial tail recursive
       *
       * @param x factorial value
       * @param acc accumulator
-      * @return the result of the operation
+      * @return factorial of x
       */
     @tailrec
     def fact(x: Int, acc: Int): Int = if (x == 0) acc else fact(x - 1, acc * x)
@@ -147,7 +148,7 @@ object Trees {
       fact(x, 1)
   }
 
-  /** greatest common divisor
+  /** Greatest common divisor
     *
     * @param x first value
     * @param y second value
@@ -156,20 +157,20 @@ object Trees {
   @tailrec
   def gcd(x: Int, y: Int): Int = if (y == 0) x else gcd(y, x % y)
 
-  /** sqrt
+  /** Square root
     *
     * @param n number
     * @param epsilon precision
-    * @return result of the operation
+    * @return square root of n
     */
   def sqrt(n: Double, epsilon: Double = 0.0001): Double = {
 
-    /** sqrt
+    /** Square root tail recursive
       *
       * @param n number
       * @param x approximation
       * @param epsilon precision
-      * @return
+      * @return square root of n
       */
     @tailrec
     def sqrt(n: Double, x: Double, epsilon: Double): Double =
@@ -177,51 +178,52 @@ object Trees {
         x
       else
         sqrt(n, (x + n / x) / 2, epsilon)
-    if(n == 0) 0
-    else sqrt(n, 1, epsilon)
+    if (n == 0) n else sqrt(n, 1, epsilon)
   }
 
-  /** modular inverse of u mod v
+  /** Modular multiplicative inverse
     *
-    * @param u first value
-    * @param v second value
-    * @return modular inverse of u mod v
+    * @param a first value
+    * @param m second value
+    * @return modular multiplicative inverse of a modulo m
     */
-  def modInv(u: Int, v: Int): Int = {
-    val (x, z) = egcd(u, v)
-    if (z != 1)
-      throw new UnsupportedOperationException(s"$u does not have a modular inverse")
+  def modInv(a: Int, m: Int): Int = {
+    val (x, y, _) = egcd(a, m)
+    if (x != 1)
+      throw new UnsupportedOperationException(s"$a does not have a modular multiplicative inverse")
+    else if (y < 0)
+      m + y
     else
-      x
+      y
   }
 
-  /** coefficients of Bézout's identity
+  /** Extended Euclidean
     *
-    * @param u first value
-    * @param v second value
-    * @return coefficients of Bézout's identity and gcd
+    * @param a first value
+    * @param b second value
+    * @return greatest common divisor and coefficients of Bézout's identity
     */
-  private def egcd(u: Int, v: Int): (Int, Int) = {
+  def egcd(a: Int, b: Int): (Int, Int, Int) = {
 
-    /** coefficients of Bézout's identity
+    /** Extended Euclidean tail recursive
       *
-      * @param u first value
-      * @param v second value
-      * @param x coefficient of Bézout's identity
-      * @param y coefficient of Bézout's identity
-      * @param x1 accumulator of coefficient x
-      * @param y1 accumulator of coefficient y
-      * @return coefficients of Bézout's identity and gcd
+      * @param r first value
+      * @param u coefficient of Bézout's identity
+      * @param v coefficient of Bézout's identity
+      * @param r1 second value
+      * @param u1 accumulator of u coefficient
+      * @param v1 accumulator of y coefficient
+      * @return greatest common divisor and coefficients of Bézout's identity
       */
     @tailrec
-    def egcd(u: Int, v: Int, x: Int, y: Int, x1: Int, y1: Int): (Int, Int) =
-      if (v == 0)
-        (x, y)
+    def egcd(r: Int, u: Int, v: Int, r1: Int, u1: Int, v1: Int): (Int, Int, Int) =
+      if (r1 == 0)
+        (r, u, v)
       else {
-        val q = u / v
-        egcd(v, u - q * v, x1, y1, x - q * x1, y - q * y1)
+        val q = r / r1
+        egcd(r1, u1, v1, r - q * r1, u - q * u1, v - q * v1)
       }
-    egcd(u, v, 1, 0, 0, 1)
+    egcd(a, 1, 0, b, 0, 1)
   }
 
 }
